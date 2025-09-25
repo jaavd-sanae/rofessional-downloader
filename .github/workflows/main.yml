@@ -7,17 +7,64 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: 
-      image: crazymax/buildozer:latest
-
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-
-    - name: Build APK
+      
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          git \
+          openjdk-11-jdk \
+          python3-pip \
+          autoconf \
+          libtool \
+          pkg-config \
+          zlib1g-dev \
+          libncurses5-dev \
+          libncursesw5-dev \
+          cmake \
+          libffi-dev \
+          libssl-dev
+        
+    - name: Install Python dependencies
+      run: |
+        pip install buildozer cython
+        
+    - name: Accept Android licenses
+      run: |
+        mkdir -p ~/.android
+        touch ~/.android/repositories.cfg
+        yes | sdkmanager --licenses || true
+        
+    - name: Set environment variables for Android SDK
+      run: |
+        echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
+        echo "PATH=$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools:$PATH" >> $GITHUB_ENV
+        
+    - name: Download and setup Android SDK
+      run: |
+        wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip
+        mkdir -p $HOME/android-sdk
+        unzip commandlinetools-linux-8512546_latest.zip -d $HOME/android-sdk
+        mkdir -p $HOME/android-sdk/cmdline-tools/latest
+        mv $HOME/android-sdk/cmdline-tools/* $HOME/android-sdk/cmdline-tools/latest/
+        
+    - name: Install Android SDK components
+      run: |
+        yes | sdkmanager "platform-tools" "build-tools;30.0.3" "platforms;android-30"
+        
+    - name: Build APK with Buildozer
       run: |
         buildozer android debug
-
+        
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
