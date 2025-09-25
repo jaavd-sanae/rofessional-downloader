@@ -19,13 +19,13 @@ jobs:
         
     - name: Install dependencies
       run: |
-        pip install buildozer
+        pip install buildozer cython  # اضافه کردن cython اینجا
         sudo apt-get update
         sudo apt-get install -y git unzip openjdk-11-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev cmake libffi-dev libssl-dev
         
     - name: Build APK with Buildozer
       run: |
-        buildozer android debug  # فقط این خط بمونه، init رو حذف کردم
+        buildozer android debug
         
     - name: Upload APK
       uses: actions/upload-artifact@v4
