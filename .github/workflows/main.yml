@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04  # تغییر به نسخه قدیمی‌تر
     
     steps:
     - name: Checkout code
@@ -21,7 +21,8 @@ jobs:
       run: |
         pip install buildozer
         sudo apt-get update
-        sudo apt-get install -y git unzip openjdk-11-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+        sudo apt-get install -y git unzip openjdk-11-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev cmake libffi-dev libssl-dev
+        # حذف libtinfo5 چون دیگه نیاز نیست
         
     - name: Build APK with Buildozer
       run: |
